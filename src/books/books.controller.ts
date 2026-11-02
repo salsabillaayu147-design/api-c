@@ -1,53 +1,60 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
 
-import { Book } from './entitas/book-entity.js';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 
-import { BookService } from './books.service.js';
-
+import { BooksService } from './books.service.js';
 import { CreateBookDto } from './dto/create-book-dto.js';
 
-// Controller untuk mengatur data buku
 @Controller('books')
 export class BooksController {
+  constructor(private bookService: BooksService) {}
 
-  // Memanggil BookService
-  constructor(private readonly bookService: BookService) {}
-
-  // Mengambil semua data buku
-  // GET /books
+  // Menampilkan semua buku
   @Get()
-  getAllBooks(): Book[] {
-    return this.bookService.getAllBooks();
+  getAllBooks() {
+    return this.bookService.findAll();
   }
 
-  // Mengambil satu buku berdasarkan ID
-  // GET /books/:id
+  // Mengecek buku berdasarkan ISBN
+  @Get('check-isbn/:isbn')
+  checkBookByIsbn(@Param('isbn') isbn: string) {
+    return this.bookService.checkIsbn(isbn);
+  }
+  @Put('restore/:id')
+  restoreBook(@Param('id') id: string) {
+    return this.bookService.restore(id);
+  }
+  // Mengambil buku berdasarkan ID
   @Get(':id')
-  getBookById(@Param('id') id: string): Book | undefined {
-    return this.bookService.findOne(Number(id));
+  getBookById(@Param('id') id: string) {
+    return this.bookService.findOne(id);
   }
 
   // Menambahkan buku baru
-  // POST /books
   @Post()
   createBook(@Body() book: CreateBookDto) {
     return this.bookService.create(book);
   }
 
-  // Mengubah data buku berdasarkan ID
-  // PUT /books/:id
+  // Mengupdate buku berdasarkan ID
   @Put(':id')
   updateBook(
     @Param('id') id: string,
     @Body() book: CreateBookDto,
   ) {
-    return this.bookService.update(Number(id), book);
+    return this.bookService.update(id, book);
   }
 
-  // Menghapus data buku berdasarkan ID
-  // DELETE /books/:id
+  // Menghapus buku berdasarkan ID
   @Delete(':id')
-  deleteBook(@Param('id') id: string): Book | undefined {
-    return this.bookService.remove(Number(id));
+  deleteBook(@Param('id') id: string) {
+    return this.bookService.delete(id);
   }
 }

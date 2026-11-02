@@ -1,32 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { BooksController } from './books.controller.js';
 import { BooksService } from './books.service.js';
-import { DiscountsModule } from '../discounts/discounts.module.js';
-import { Book } from './book.entity.js';
+import { Book } from './entities/book.entity.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    DiscountsModule,
-    TypeOrmModule.forFeature([Book]),
-  ],
+  imports: [TypeOrmModule.forFeature([Book])],
   controllers: [BooksController],
-  providers: [
-    BooksService,
-    {
-      provide: 'PENALTY_CALCULATOR',
-      useFactory: () => {
-        const standardRatePerDay = 2500;
-
-        return {
-          calculate: (daysLate: number) =>
-            daysLate * standardRatePerDay,
-          dailyRate: standardRatePerDay,
-        };
-      },
-    },
-  ],
-  exports: [BooksService],
+  providers: [BooksService]
 })
 export class BooksModule {}
